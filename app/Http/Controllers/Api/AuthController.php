@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // ✅ REGISTER
+    // ==========================
+    // REGISTER
+    // ==========================
     public function register(Request $request)
     {
         $request->validate([
@@ -18,24 +21,36 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
+        // Create user
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => 'user',
         ]);
 
+        // Auto assign role "user"
+        $defaultRole = Role::where('slug', 'user')->first();
+        $user->roles()->attach($defaultRole->id);
+
+        // Create Token
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Registrasi berhasil',
-            'token' => $token,
-            'user' => $user
+            'token'   => $token,
+            'user'    => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('slug'),
+            ]
         ]);
     }
 
-    // ✅ LOGIN
+    // ==========================
+    // LOGIN
+    // ==========================
     public function login(Request $request)
     {
         $request->validate([
@@ -47,28 +62,39 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Email atau password salah'
             ], 401);
         }
 
+        // Clear previous tokens
+        $user->tokens()->delete();
+
+        // Create new token
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Login berhasil',
-            'token' => $token,
-            'user' => $user
+            'token'   => $token,
+            'user'    => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('slug'), // <-- penting
+            ]
         ]);
     }
 
-    // ✅ LOGOUT
+    // ==========================
+    // LOGOUT
+    // ==========================
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Logout berhasil'
         ]);
     }
