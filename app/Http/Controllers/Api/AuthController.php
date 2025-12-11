@@ -127,4 +127,16 @@ class AuthController extends Controller
             'data' => $user
         ]);
     }
+
+    public function getPetugas()
+    {
+        $petugas = User::whereHas('roles', function($q) {
+            $q->where('slug', 'petugas');
+        })->get(['id', 'name', 'email']);
+
+        return response()->json([
+            'status' => true,
+            'petugas' => $petugas
+        ]);
+    }
 }

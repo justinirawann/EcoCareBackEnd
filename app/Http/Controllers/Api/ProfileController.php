@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -17,7 +18,8 @@ class ProfileController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'password' => 'nullable|string|min:6'
+            'password' => 'nullable|string|min:6',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $user->name = $request->name;
@@ -27,6 +29,17 @@ class ProfileController extends Controller
         
         if ($request->password) {
             $user->password = Hash::make($request->password);
+        }
+        
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+            
+            // Store new image
+            $imagePath = $request->file('image')->store('profile-images', 'public');
+            $user->image = $imagePath;
         }
         
         $user->save();
@@ -40,6 +53,7 @@ class ProfileController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'address' => $user->address,
+                'image' => $user->image,
                 'roles' => $user->roles->pluck('slug')
             ]
         ]);
