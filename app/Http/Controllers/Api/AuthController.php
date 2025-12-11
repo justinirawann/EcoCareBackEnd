@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // ==========================
-    // REGISTER
-    // ==========================
+    
     public function register(Request $request)
     {
         $request->validate([
@@ -96,6 +94,37 @@ class AuthController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'Logout berhasil'
+        ]);
+    }
+
+    public function createPetugas(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string'
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+
+        // Assign role petugas
+        $petugasRole = Role::where('slug', 'petugas')->first();
+        if ($petugasRole) {
+            $user->roles()->attach($petugasRole->id);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Petugas berhasil dibuat',
+            'data' => $user
         ]);
     }
 }
