@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RecyclingController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\UserManagementController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -40,17 +41,25 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('/admin/reports', [ReportController::class, 'index']);
         Route::put('/admin/reports/{id}/verify', [ReportController::class, 'verify']);
-        Route::post('/admin/create-petugas', [AuthController::class, 'createPetugas']);
+        Route::put('/admin/reports/{id}/assign-petugas', [ReportController::class, 'assignPetugas']);
+
         Route::get('/admin/recycling', [RecyclingController::class, 'adminIndex']);
         Route::put('/admin/recycling/{id}/approve', [RecyclingController::class, 'approve']);
         Route::put('/admin/recycling/{id}/reject', [RecyclingController::class, 'reject']);
         Route::put('/admin/recycling/{id}/assign', [RecyclingController::class, 'assignPetugas']);
-        Route::get('/admin/petugas', [AuthController::class, 'getPetugas']);
+
         
         // 📰 Articles Management
         Route::post('/articles', [ArticleController::class, 'store']);
         Route::put('/articles/{article}', [ArticleController::class, 'update']);
         Route::delete('/articles/{article}', [ArticleController::class, 'destroy']);
+        
+        // 👥 User Management
+        Route::get('/admin/users', [UserManagementController::class, 'index']);
+        Route::post('/admin/users', [UserManagementController::class, 'store']);
+        Route::put('/admin/users/{id}', [UserManagementController::class, 'update']);
+        Route::delete('/admin/users/{id}', [UserManagementController::class, 'destroy']);
+        Route::post('/admin/users/{id}/reset-password', [UserManagementController::class, 'resetPassword']);
     });
 
 
@@ -60,6 +69,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('/petugas/recycling-tasks', [RecyclingController::class, 'petugasTasks']);
         Route::put('/petugas/recycling/{id}/complete', [RecyclingController::class, 'completeTask']);
+        Route::get('/petugas/report-tasks', [ReportController::class, 'petugasReports']);
+        Route::put('/petugas/reports/{id}/payment', [ReportController::class, 'updatePaymentStatus']);
+        Route::put('/petugas/reports/{id}/fee', [ReportController::class, 'updateFee']);
+        Route::put('/petugas/reports/{id}/complete', [ReportController::class, 'completeReport']);
+        Route::put('/petugas/recycling/{id}/payment', [RecyclingController::class, 'updatePaymentStatus']);
     });
 
     Route::post('/recycling/create', [RecyclingController::class, 'create']);

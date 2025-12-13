@@ -169,4 +169,21 @@ class RecyclingController extends Controller
             'message' => 'Tugas berhasil diselesaikan'
         ]);
     }
+
+    public function updatePaymentStatus(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:paid,unpaid'
+        ]);
+
+        $order = RecyclingOrder::findOrFail($id);
+        $order->payment_status = $request->payment_status;
+        $order->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Status pembayaran berhasil diupdate',
+            'order' => $order
+        ]);
+    }
 }

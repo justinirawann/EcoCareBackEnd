@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['Pending', 'Approved', 'Berjalan', 'Selesai', 'Ditolak'])->default('Pending');
             $table->foreignId('petugas_id')->nullable()->constrained('users')->onDelete('set null');
             $table->text('admin_notes')->nullable();
+            $table->enum('payment_status', ['unpaid', 'paid'])->default('unpaid');
             $table->timestamps();
         });
     }

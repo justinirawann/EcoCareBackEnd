@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller
 {
@@ -39,13 +40,24 @@ class ArticleController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
             'content' => 'required|string',
-            'featured_image' => 'nullable|string',
-            'published_at' => 'nullable|date_format:Y-m-d H:i:s',
+            'featured_image' => 'nullable|image|max:2048',
+            'published_at' => 'nullable|date',
         ]);
 
-        $validated['user_id'] = auth()->id();
+        // Handle image upload
+        $imagePath = null;
+        if ($request->hasFile('featured_image')) {
+            $imagePath = $request->file('featured_image')->store('articles', 'public');
+        }
 
-        $article = Article::create($validated);
+        $article = Article::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'content' => $validated['content'],
+            'featured_image' => $imagePath,
+            'published_at' => $validated['published_at'],
+            'user_id' => auth()->id(),
+        ]);
 
         return response()->json([
             'message' => 'Article created successfully',
@@ -59,7 +71,9 @@ class ArticleController extends Controller
     public function update(Request $request, Article $article): JsonResponse
     {
         // Check if user is the author or admin
-        if (auth()->id() !== $article->user_id && !auth()->user()->is_admin) {
+        $user = auth()->user();
+        $isAdmin = $user->roles()->where('slug', 'admin')->exists();
+        if ($user->id !== $article->user_id && !$isAdmin) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -67,11 +81,27 @@ class ArticleController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
             'content' => 'required|string',
-            'featured_image' => 'nullable|string',
-            'published_at' => 'nullable|date_format:Y-m-d H:i:s',
+            'featured_image' => 'nullable|image|max:2048',
+            'published_at' => 'nullable|date',
         ]);
 
-        $article->update($validated);
+        // Handle image upload
+        $imagePath = $article->featured_image; // Keep existing image
+        if ($request->hasFile('featured_image')) {
+            // Delete old image if exists
+            if ($article->featured_image) {
+                \Storage::disk('public')->delete($article->featured_image);
+            }
+            $imagePath = $request->file('featured_image')->store('articles', 'public');
+        }
+
+        $article->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'content' => $validated['content'],
+            'featured_image' => $imagePath,
+            'published_at' => $validated['published_at'],
+        ]);
 
         return response()->json([
             'message' => 'Article updated successfully',
@@ -85,7 +115,9 @@ class ArticleController extends Controller
     public function destroy(Article $article): JsonResponse
     {
         // Check if user is the author or admin
-        if (auth()->id() !== $article->user_id && !auth()->user()->is_admin) {
+        $user = auth()->user();
+        $isAdmin = $user->roles()->where('slug', 'admin')->exists();
+        if ($user->id !== $article->user_id && !$isAdmin) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

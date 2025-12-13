@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('photo')->nullable(); // path file
             $table->enum('status', ['pending', 'verified', 'completed', 'rejected'])->default('pending');
             $table->text('admin_notes')->nullable(); // catatan dari admin
+            $table->foreignId('assigned_petugas_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->enum('payment_status', ['unpaid', 'paid'])->default('unpaid');
+            $table->decimal('fee_amount', 10, 2)->nullable(); // biaya yang harus dibayar user
 
             $table->timestamps();
         });

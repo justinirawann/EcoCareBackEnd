@@ -13,11 +13,19 @@ class Report extends Model
         'location',
         'photo',
         'status',
-        'admin_notes'
+        'admin_notes',
+        'assigned_petugas_id',
+        'payment_status',
+        'fee_amount'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assignedPetugas()
+    {
+        return $this->belongsTo(User::class, 'assigned_petugas_id');
     }
 }
