@@ -6,9 +6,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RecyclingController;
+use App\Http\Controllers\Api\ArticleController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/articles', [ArticleController::class, 'index']);
+Route::get('/articles/{article}', [ArticleController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -43,6 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/admin/recycling/{id}/reject', [RecyclingController::class, 'reject']);
         Route::put('/admin/recycling/{id}/assign', [RecyclingController::class, 'assignPetugas']);
         Route::get('/admin/petugas', [AuthController::class, 'getPetugas']);
+        
+        // 📰 Articles Management
+        Route::post('/articles', [ArticleController::class, 'store']);
+        Route::put('/articles/{article}', [ArticleController::class, 'update']);
+        Route::delete('/articles/{article}', [ArticleController::class, 'destroy']);
     });
 
 
@@ -54,6 +62,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/petugas/recycling/{id}/complete', [RecyclingController::class, 'completeTask']);
     });
 
+    Route::post('/recycling/create', [RecyclingController::class, 'create']);
+        Route::get('/recycling/my-orders', [RecyclingController::class, 'myOrders']);
 
     Route::middleware('role:user')->group(function () {
         Route::get('/dashboard', function () {
@@ -62,8 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/reports/create', [ReportController::class, 'create']);
         Route::get('/reports/my-reports', [ReportController::class, 'myReports']);
         Route::put('/reports/{id}/update', [ReportController::class, 'update']);
-        Route::post('/recycling/create', [RecyclingController::class, 'create']);
-        Route::get('/recycling/my-orders', [RecyclingController::class, 'myOrders']);
+        
     });
 
 });

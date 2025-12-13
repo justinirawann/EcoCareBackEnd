@@ -10,6 +10,14 @@ class RecyclingController extends Controller
 {
     public function create(Request $request)
     {
+        // Cek apakah user memiliki role 'user'
+        if (!$request->user()->hasRole('user')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya user yang bisa membuat pesanan daur ulang.'
+            ], 403);
+        }
+
         $request->validate([
             'category' => 'required|in:Logam,Minyak,Kertas,Elektronik,Besi,Kaca,Plastik',
             'weight' => 'required|numeric|min:0.1',
@@ -42,6 +50,14 @@ class RecyclingController extends Controller
 
     public function myOrders(Request $request)
     {
+        // Cek apakah user memiliki role 'user'
+        if (!$request->user()->hasRole('user')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya user yang bisa melihat pesanan daur ulang.'
+            ], 403);
+        }
+
         $orders = RecyclingOrder::where('user_id', $request->user()->id)
             ->with('petugas')
             ->orderBy('created_at', 'desc')
