@@ -439,6 +439,10 @@ return [
     'report_deleted' => 'Report successfully deleted',
     'order_deleted' => 'Order successfully deleted',
     'delete_failed' => 'Failed to delete data',
+    'profile_incomplete_title' => 'Profile Incomplete',
+    'profile_incomplete_message' => 'To create a report, you must complete your profile first. Make sure your name, email, phone number, address, and profile photo are all filled in.',
+    'complete_profile_button' => 'Complete Profile',
+    'later_button' => 'Later',
 ];
 
 

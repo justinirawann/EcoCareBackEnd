@@ -434,6 +434,10 @@ return [
     'report_deleted' => 'Laporan berhasil dihapus',
     'order_deleted' => 'Pesanan berhasil dihapus',
     'delete_failed' => 'Gagal menghapus data',
+    'profile_incomplete_title' => 'Profil Belum Lengkap',
+    'profile_incomplete_message' => 'Untuk membuat laporan, Anda harus melengkapi profil terlebih dahulu. Pastikan data nama, email, nomor telepon, alamat, dan foto profil sudah terisi semua.',
+    'complete_profile_button' => 'Lengkapi Profil',
+    'later_button' => 'Nanti Saja',
 ];
 
 
