@@ -186,4 +186,21 @@ class RecyclingController extends Controller
             'order' => $order
         ]);
     }
+
+    public function destroy($id)
+    {
+        $order = RecyclingOrder::findOrFail($id);
+        
+        // Hapus foto jika ada
+        if ($order->image) {
+            \Storage::disk('public')->delete($order->image);
+        }
+        
+        $order->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Pesanan daur ulang berhasil dihapus'
+        ]);
+    }
 }

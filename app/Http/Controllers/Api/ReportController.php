@@ -250,4 +250,21 @@ class ReportController extends Controller
             'data' => $report
         ]);
     }
+
+    public function destroy($id)
+    {
+        $report = Report::findOrFail($id);
+        
+        // Hapus foto jika ada
+        if ($report->photo) {
+            Storage::disk('public')->delete($report->photo);
+        }
+        
+        $report->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Laporan berhasil dihapus'
+        ]);
+    }
 }

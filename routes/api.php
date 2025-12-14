@@ -8,11 +8,16 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RecyclingController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\UserManagementController;
+use App\Http\Controllers\Api\LocalizationController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/articles/{article}', [ArticleController::class, 'show']);
+
+// Localization routes (public)
+Route::get('/translations', [LocalizationController::class, 'getTranslations']);
+Route::post('/set-locale', [LocalizationController::class, 'setLocale']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -42,11 +47,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/reports', [ReportController::class, 'index']);
         Route::put('/admin/reports/{id}/verify', [ReportController::class, 'verify']);
         Route::put('/admin/reports/{id}/assign-petugas', [ReportController::class, 'assignPetugas']);
+        Route::delete('/admin/reports/{id}', [ReportController::class, 'destroy']);
 
         Route::get('/admin/recycling', [RecyclingController::class, 'adminIndex']);
         Route::put('/admin/recycling/{id}/approve', [RecyclingController::class, 'approve']);
         Route::put('/admin/recycling/{id}/reject', [RecyclingController::class, 'reject']);
         Route::put('/admin/recycling/{id}/assign', [RecyclingController::class, 'assignPetugas']);
+        Route::delete('/admin/recycling/{id}', [RecyclingController::class, 'destroy']);
 
         
         // 📰 Articles Management
