@@ -12,6 +12,17 @@ use App\Http\Controllers\Api\LocalizationController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+// Setup route (untuk development/production setup)
+Route::get('/setup', function() {
+    try {
+        \Artisan::call('db:seed', ['--class' => 'RolePermissionSeeder']);
+        \Artisan::call('db:seed', ['--class' => 'UserSeeder']);
+        return response()->json(['message' => 'Database seeded successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/articles/{article}', [ArticleController::class, 'show']);
 

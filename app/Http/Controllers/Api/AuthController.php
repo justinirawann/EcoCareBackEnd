@@ -27,8 +27,15 @@ class AuthController extends Controller
         ]);
 
         // Auto assign role "user"
-        $defaultRole = Role::where('slug', 'user')->first();
+        $defaultRole = Role::firstOrCreate(
+            ['slug' => 'user'],
+            ['name' => 'User Biasa']
+        );
+        
         $user->roles()->attach($defaultRole->id);
+
+        // Reload user with roles
+        $user->load('roles');
 
         // Create Token
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -70,6 +77,9 @@ class AuthController extends Controller
 
         // Create new token
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Load roles
+        $user->load('roles');
 
         return response()->json([
             'status'  => true,
