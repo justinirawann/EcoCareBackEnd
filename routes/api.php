@@ -23,6 +23,60 @@ Route::get('/setup', function() {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
+// Debug route untuk cek admin user
+Route::get('/debug-admin', function() {
+    $admin = \App\Models\User::where('email', 'admin@ecocare.com')->with('roles')->first();
+    if ($admin) {
+        return response()->json([
+            'found' => true,
+            'user' => [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'email' => $admin->email,
+                'roles' => $admin->roles->pluck('slug')
+            ]
+        ]);
+    }
+    return response()->json(['found' => false, 'message' => 'Admin user not found']);
+});
+
+// Create admin manual - FORCE CREATE
+Route::get('/force-create-admin', function() {
+    try {
+        // Delete existing admin if any
+        \App\Models\User::where('email', 'admin@ecocare.com')->delete();
+        
+        // Create fresh admin
+        $user = \App\Models\User::create([
+            'name' => 'Admin EcoCare',
+            'email' => 'admin@ecocare.com',
+            'password' => \Hash::make('admin123')
+        ]);
+        
+        // Create admin role if not exists
+        $adminRole = \App\Models\Role::firstOrCreate(
+            ['slug' => 'admin'],
+            ['name' => 'Administrator']
+        );
+        
+        // Attach role
+        $user->roles()->attach($adminRole->id);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Admin FORCE created successfully',
+            'credentials' => [
+                'email' => 'admin@ecocare.com',
+                'password' => 'admin123'
+            ],
+            'user_id' => $user->id,
+            'role_attached' => true
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/articles/{article}', [ArticleController::class, 'show']);
 
