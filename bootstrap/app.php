@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         
+        // Exclude CSRF from API routes
+        $middleware->validateCsrfTokens(except: [
+            'api/*'
+        ]);
         
         $middleware->alias([
             'role'       => RoleMiddleware::class,
