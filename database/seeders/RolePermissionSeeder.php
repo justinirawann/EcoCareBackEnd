@@ -10,65 +10,67 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        
-        $admin = Role::create([
-            'name' => 'Administrator',
-            'slug' => 'admin'
-        ]);
+        // ===== ROLES =====
+        $admin = Role::firstOrCreate(
+            ['slug' => 'admin'],
+            ['name' => 'Administrator']
+        );
 
-        $user = Role::create([
-            'name' => 'User Biasa',
-            'slug' => 'user'
-        ]);
+        $user = Role::firstOrCreate(
+            ['slug' => 'user'],
+            ['name' => 'User Biasa']
+        );
 
-        $petugas = Role::create([
-            'name' => 'Petugas Lapangan',
-            'slug' => 'petugas'
-        ]);
+        $petugas = Role::firstOrCreate(
+            ['slug' => 'petugas'],
+            ['name' => 'Petugas Lapangan']
+        );
 
-        $createReport = Permission::create([
-            'name' => 'Buat Laporan Sampah',
-            'slug' => 'create_report'
-        ]);
+        // ===== PERMISSIONS =====
+        $createReport = Permission::firstOrCreate(
+            ['slug' => 'create_report'],
+            ['name' => 'Buat Laporan Sampah']
+        );
 
-        $verifyReport = Permission::create([
-            'name' => 'Verifikasi Laporan Sampah',
-            'slug' => 'verify_report'
-        ]);
+        $verifyReport = Permission::firstOrCreate(
+            ['slug' => 'verify_report'],
+            ['name' => 'Verifikasi Laporan Sampah']
+        );
 
-        $pickupTask = Permission::create([
-            'name' => 'Tugas Penjemputan Sampah',
-            'slug' => 'pickup_task'
-        ]);
+        $pickupTask = Permission::firstOrCreate(
+            ['slug' => 'pickup_task'],
+            ['name' => 'Tugas Penjemputan Sampah']
+        );
 
-        $adminDashboard = Permission::create([
-            'name' => 'Akses Dashboard Admin',
-            'slug' => 'dashboard_admin'
-        ]);
+        $adminDashboard = Permission::firstOrCreate(
+            ['slug' => 'dashboard_admin'],
+            ['name' => 'Akses Dashboard Admin']
+        );
 
-        $userDashboard = Permission::create([
-            'name' => 'Akses Dashboard User',
-            'slug' => 'dashboard_user'
-        ]);
+        $userDashboard = Permission::firstOrCreate(
+            ['slug' => 'dashboard_user'],
+            ['name' => 'Akses Dashboard User']
+        );
 
-        $petugasDashboard = Permission::create([
-            'name' => 'Akses Dashboard Petugas',
-            'slug' => 'dashboard_petugas'
-        ]);
+        $petugasDashboard = Permission::firstOrCreate(
+            ['slug' => 'dashboard_petugas'],
+            ['name' => 'Akses Dashboard Petugas']
+        );
 
-        $admin->permissions()->attach([
+        // ===== ATTACH PERMISSIONS (SAFE) =====
+        $admin->permissions()->syncWithoutDetaching([
             $createReport->id,
             $verifyReport->id,
             $pickupTask->id,
             $adminDashboard->id,
         ]);
 
-        $user->permissions()->attach([
+        $user->permissions()->syncWithoutDetaching([
             $createReport->id,
             $userDashboard->id,
         ]);
 
-        $petugas->permissions()->attach([
+        $petugas->permissions()->syncWithoutDetaching([
             $pickupTask->id,
             $petugasDashboard->id,
         ]);
