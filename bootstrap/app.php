@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\CheckPermission;
+use App\Http\Middleware\CorsMiddleware;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -24,9 +25,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role'       => RoleMiddleware::class,
             'permission' => CheckPermission::class,
+            'cors'       => CorsMiddleware::class,
         ]);
 
-       
+        // Add CORS middleware for API routes
+        $middleware->api(prepend: [
+            CorsMiddleware::class,
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+        
         $middleware->append(EnsureFrontendRequestsAreStateful::class);
 
     })
