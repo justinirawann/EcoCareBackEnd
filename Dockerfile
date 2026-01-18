@@ -16,9 +16,8 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer install \
     --no-interaction \
     --prefer-dist
 
-RUN php artisan migrate --force \
- && php artisan db:seed --force
- 
+RUN php artisan migrate --force && php artisan db:seed --force
+
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 8000
