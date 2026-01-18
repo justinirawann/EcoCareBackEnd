@@ -22,8 +22,7 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 8000
 
-CMD bash -c "php artisan key:generate --force \
- && php artisan config:clear \
+CMD bash -c "php artisan config:clear \
  && php artisan cache:clear \
  && php artisan storage:link \
  && php artisan migrate --force \
